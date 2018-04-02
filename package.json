@@ -29,14 +29,12 @@
     "gulp-rename": "1.2.2",
     "gulp-sass": "3.1.0",
     "gulp-sourcemaps": "2.6.0",
-    "gulp-webpack": "1.5.0"
+    "gulp-webpack": "1.5.0",
+    "chai": "4.1.2"
   },
   "babel": {
     "plugins": [
       "transform-es2015-modules-commonjs"
     ]
-  },
-  "dependencies": {
-    "chai": "^4.1.2"
   }
 }
