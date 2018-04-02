@@ -1,19 +1,21 @@
 import {createElement, changeView} from './util';
 import renderHeader from './game/header';
 import renderLevel from './game/game-level';
-import {quest, game} from './data/quest';
+import {INITIAL_GAME, changeLevel} from './data/quest';
+import QUEST from './data/quest-data';
 import end from './end';
 
 const footer = `<div class="result"></div>
 <small>Для справки введите <i>help</i></small></ul>`;
 
-let current = -1;
 let element;
 
-const getLevel = (num) => quest[`level-${num}`];
+let game = Object.assign({}, INITIAL_GAME);
 
-const changeLevel = (num) => {
-  current = num;
+const getLevel = () => QUEST[`level-${game.level}`];
+
+const updateLevel = (num) => {
+  game = changeLevel(game, num);
   const level = getLevel(num);
 
   element = createElement(`
@@ -24,15 +26,15 @@ const changeLevel = (num) => {
 };
 
 // Load first level on start!
-element = changeLevel(0);
+element = updateLevel(0);
 
 document.onkeydown = (evt) => {
   if (evt.keyCode === 13) {
-    const next = current + 1;
+    const next = game.level + 1;
     if (getLevel(next)) {
-      changeView(changeLevel(next));
+      changeView(updateLevel(next));
     } else {
-      changeLevel(0);
+      updateLevel(0);
       changeView(end);
     }
   }
