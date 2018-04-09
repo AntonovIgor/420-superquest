@@ -1,5 +1,5 @@
-export const createElement = (template) => {
-  const outer = document.createElement(`div`);
+export const createElement = (template = ``, tagName = `div`) => {
+  const outer = document.createElement(tagName);
   outer.innerHTML = template;
   return outer;
 };
