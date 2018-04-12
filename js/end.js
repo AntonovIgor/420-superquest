@@ -1,5 +1,5 @@
 import {createElement, changeView} from './util';
-import game from './game';
+import game from './game/game';
 
 const html = `
 <div class="end">
