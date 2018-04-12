@@ -1,60 +1,60 @@
-import {createElement, changeView} from '../util';
-import renderHeader from './header';
-import renderLevel from './level';
-import footer from './footer';
-import {INITIAL_GAME, changeLevel, canContinue, die} from '../data/quest';
+import {createElement, changeView, updateView} from '../util';
+import {INITIAL_GAME, changeLevel, canContinue, die, Result} from '../data/quest';
 import QUEST from '../data/quest-data';
-import end from '../end';
+import FooterView from "./footer-view";
+import HeaderView from "./header-view";
+import LevelView from "./level-view";
+import EndView from "../end-view";
 
-const ENTER_KEY_CODE = 13;
-let game;
-
-const resetGame = () => {
-  game = Object.assign({}, INITIAL_GAME);
-};
+let game = Object.assign({}, INITIAL_GAME);
 
 const gameContainerElement = createElement();
-const headerElement = createElement();
-const levelElement = createElement();
+const headerContainer = createElement();
+const levelContainer = createElement();
 
 // init game content
-gameContainerElement.appendChild(headerElement);
-gameContainerElement.appendChild(levelElement);
-gameContainerElement.appendChild(footer);
-
-levelElement.addEventListener(`keydown`, ({keyCode}) => {
-  if (keyCode === ENTER_KEY_CODE) {
-    const current = getLevel(game.level);
-    const {value = ``} = levelElement.querySelector(`input`);
-    const userAnswer = value.toUpperCase();
-    for (const answer of current.answers) {
-      if (userAnswer === answer.action.toUpperCase()) {
-        const nextLevel = answer.go();
-        try {
-          game = changeLevel(game, nextLevel);
-        } catch (e) {
-          if (canContinue(game)) {
-            game = die(game);
-          } else {
-            resetGame();
-            changeView(end);
-          }
-        }
-        updateGame(game);
-      }
-    }
-  }
-});
+gameContainerElement.appendChild(headerContainer);
+gameContainerElement.appendChild(levelContainer);
+gameContainerElement.appendChild(new FooterView().element);
 
 const getLevel = () => QUEST[`level-${game.level}`];
 
+const end = new EndView().element;
+
+const onUserAnswer = (answer) => {
+  const result = answer.result;
+  switch (result) {
+    case Result.DIE:
+      game = die(game);
+      break;
+    case Result.WIN:
+      changeView(end);
+      break;
+    case Result.NEXT_LEVEL:
+      game = changeLevel(game, game.level + 1);
+      break;
+    case Result.NOOP:
+      // just do nothing
+      break;
+    default:
+      throw new Error(`Unknown result: ${result}`);
+  }
+  if (!canContinue(game)) {
+    changeView(end);
+  } else {
+    updateGame(game);
+  }
+};
+
 const updateGame = (state) => {
-  headerElement.innerHTML = renderHeader(state);
-  levelElement.innerHTML = renderLevel(getLevel(state.level));
+  updateView(headerContainer, new HeaderView(state));
+  const level = new LevelView(getLevel(state.level));
+  updateView(levelContainer, level);
+  level.focus();
+  level.onAnswer = onUserAnswer;
 };
 
 // Load first level on start!
-resetGame();
 updateGame(game);
 
 export default gameContainerElement;

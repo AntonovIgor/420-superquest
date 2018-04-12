@@ -1,4 +1,12 @@
 import game from './game/game';
 import {changeView} from './util';
+import PreviewView from "./preview-view";
 
-changeView(game);
+const preview = new PreviewView();
+
+changeView(preview.element);
+
+preview.onAgreeClick = () => {
+  changeView(game);
+};
+
