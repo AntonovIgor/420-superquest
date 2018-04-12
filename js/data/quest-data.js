@@ -1,3 +1,5 @@
+import {Result} from './quest';
+
 const QUEST = {
   'level-0': {
     text: `Вас зовут Луиджи Марио, вы водопроводчик, но сейчас перед вами стоит очень важная миссия — спасти принцессу 
@@ -9,21 +11,17 @@ const QUEST = {
       {
         action: `left`,
         title: `Вы побежите влево, от гриба`,
-        go() {
-        }
+        result: Result.DIE
       },
       {
         action: `right`,
         title: `Вы побежите вправо, прямо на гриб`,
-        go() {
-        }
+        result: Result.DIE
       },
       {
         action: `jump`,
         title: `Вы прыгнете вверх`,
-        go() {
-          return 1;
-        }
+        result: Result.NEXT_LEVEL
       }
     ]
   },
@@ -35,9 +33,7 @@ const QUEST = {
       {
         action: `jump`,
         title: `Как что, конечно же подпрыгну и со всей силы ударюсь головой о железяку!`,
-        go() {
-          return 2;
-        }
+        result: Result.NEXT_LEVEL
       }
     ]
   },
@@ -50,9 +46,7 @@ const QUEST = {
       {
         action: `1`,
         title: `Конечно же съесть его!`,
-        go() {
-          return 0;
-        }
+        result: Result.WIN
       }
     ]
   }
