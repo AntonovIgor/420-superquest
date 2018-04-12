@@ -1,5 +1,5 @@
 import {changeView} from './util';
-import game from './game/game';
+import game from './game/game-screen';
 import AbstractView from "./abstract-view";
 
 export default class EndView extends AbstractView {

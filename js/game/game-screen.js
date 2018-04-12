@@ -6,7 +6,7 @@ import HeaderView from "./header-view";
 import LevelView from "./level-view";
 import EndView from "../end-view";
 
-let game = Object.assign({}, INITIAL_GAME);
+let gameState = Object.assign({}, INITIAL_GAME);
 
 const gameContainerElement = createElement();
 const headerContainer = createElement();
@@ -17,7 +17,7 @@ gameContainerElement.appendChild(headerContainer);
 gameContainerElement.appendChild(levelContainer);
 gameContainerElement.appendChild(new FooterView().element);
 
-const getLevel = () => QUEST[`level-${game.level}`];
+const getLevel = () => QUEST[`level-${gameState.level}`];
 
 const end = new EndView().element;
 
@@ -25,13 +25,13 @@ const onUserAnswer = (answer) => {
   const result = answer.result;
   switch (result) {
     case Result.DIE:
-      game = die(game);
+      gameState = die(gameState);
       break;
     case Result.WIN:
       changeView(end);
       break;
     case Result.NEXT_LEVEL:
-      game = changeLevel(game, game.level + 1);
+      gameState = changeLevel(gameState, gameState.level + 1);
       break;
     case Result.NOOP:
       // just do nothing
@@ -39,10 +39,10 @@ const onUserAnswer = (answer) => {
     default:
       throw new Error(`Unknown result: ${result}`);
   }
-  if (!canContinue(game)) {
+  if (!canContinue(gameState)) {
     changeView(end);
   } else {
-    updateGame(game);
+    updateGame(gameState);
   }
 };
 
@@ -55,6 +55,6 @@ const updateGame = (state) => {
 };
 
 // Load first level on start!
-updateGame(game);
+updateGame(gameState);
 
 export default gameContainerElement;

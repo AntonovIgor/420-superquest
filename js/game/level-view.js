@@ -55,4 +55,4 @@ export default class LevelView extends AbstractView {
     });
 
   }
-};
+}

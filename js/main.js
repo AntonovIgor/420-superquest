@@ -1,4 +1,4 @@
-import game from './game/game';
+import gameScreen from './game/game-screen';
 import {changeView} from './util';
 import PreviewView from "./preview-view";
 
@@ -7,6 +7,6 @@ const preview = new PreviewView();
 changeView(preview.element);
 
 preview.onAgreeClick = () => {
-  changeView(game);
+  changeView(gameScreen);
 };
 
