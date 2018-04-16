@@ -17,14 +17,14 @@ export default class Application {
     changeView(welcome.element);
   }
 
-  static showGame() {
-    const gameScreen = new GameScreen(new QuestModel());
+  static showGame(playerName) {
+    const gameScreen = new GameScreen(new QuestModel(playerName));
     changeView(gameScreen.element);
     gameScreen.startGame();
   }
 
   static showStats(model) {
-    const statistics = new StatsScreen(model.state);
+    const statistics = new StatsScreen(model);
     changeView(statistics.element);
   }
 

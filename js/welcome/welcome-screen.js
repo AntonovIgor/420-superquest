@@ -16,7 +16,10 @@ export default class WelcomeScreen extends AbstractView {
         Уверен?!<br>
         Стопудов?!</p>
         <p>08 есть?</p>
-        <div class="repeat"><span class="repeat-action">Да</span></div>
+        <div class="repeat">
+        Ваше имя:<input type="text"><br>
+        <span class="repeat-action">Да</span>
+        </div>
       </div>`;
   }
 
@@ -24,10 +27,11 @@ export default class WelcomeScreen extends AbstractView {
   }
 
   bind() {
+    const nameField = this.element.querySelector(`input`);
     this.element.querySelector(`span.repeat-action`).onclick = (evt) => {
       evt.preventDefault();
 
-      Application.showGame();
+      Application.showGame(nameField.value);
     };
   }
 

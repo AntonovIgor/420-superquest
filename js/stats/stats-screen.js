@@ -3,15 +3,16 @@ import Application from '../application';
 
 class StatsScreen extends AbstractView {
 
-  constructor(stats) {
+  constructor(model) {
     super();
-    this.stats = stats;
+    this.playerName = model.playerName;
+    this.stats = model.state;
   }
 
   get template() {
     return `
       <div class="end">
-        <p>Ну что ж?! Вот и закончились твои приключения =(<br>
+        <p>Ну что ж, ${this.playerName}?! Вот и закончились твои приключения =(<br>
         А вот немного статистики о тебе: <br>
         Прошел за: ${this.stats.time}<br>
         Осталось жизней: ${this.stats.lives}<br>
