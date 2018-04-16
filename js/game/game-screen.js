@@ -1,60 +1,102 @@
-import {createElement, changeView, updateView} from '../util';
-import {INITIAL_GAME, changeLevel, canContinue, die, Result} from '../data/quest';
-import QUEST from '../data/quest-data';
+import {Result} from '../data/quest';
 import FooterView from "./footer-view";
 import HeaderView from "./header-view";
 import LevelView from "./level-view";
-import EndView from "../end-view";
+import GameOverView from './gameover-view';
+import Application from '../application';
 
-let gameState = Object.assign({}, INITIAL_GAME);
 
-const gameContainerElement = createElement();
-const headerContainer = createElement();
-const levelContainer = createElement();
+class GameScreen {
+  constructor(model) {
+    this.model = model;
+    this.header = new HeaderView(this.model.state);
+    this.content = new LevelView(this.model.getCurrentLevel());
 
-// init game content
-gameContainerElement.appendChild(headerContainer);
-gameContainerElement.appendChild(levelContainer);
-gameContainerElement.appendChild(new FooterView().element);
+    this.root = document.createElement(`div`);
+    this.root.appendChild(this.header.element);
+    this.root.appendChild(this.content.element);
+    this.root.appendChild(new FooterView().element);
 
-const getLevel = () => QUEST[`level-${gameState.level}`];
-
-const end = new EndView().element;
-
-const onUserAnswer = (answer) => {
-  const result = answer.result;
-  switch (result) {
-    case Result.DIE:
-      gameState = die(gameState);
-      break;
-    case Result.WIN:
-      changeView(end);
-      break;
-    case Result.NEXT_LEVEL:
-      gameState = changeLevel(gameState, gameState.level + 1);
-      break;
-    case Result.NOOP:
-      // just do nothing
-      break;
-    default:
-      throw new Error(`Unknown result: ${result}`);
+    this._interval = null;
   }
-  if (!canContinue(gameState)) {
-    changeView(end);
-  } else {
-    updateGame(gameState);
+
+  get element() {
+    return this.root;
   }
-};
 
-const updateGame = (state) => {
-  updateView(headerContainer, new HeaderView(state));
-  const level = new LevelView(getLevel(state.level));
-  updateView(levelContainer, level);
-  level.focus();
-  level.onAnswer = onUserAnswer;
-};
+  stopGame() {
+    clearInterval(this._interval);
+  }
 
-// Load first level on start!
-updateGame(gameState);
+  startGame() {
+    this.changeLevel();
 
-export default gameContainerElement;
+    this._interval = setInterval(() => {
+      this.model.tick();
+      this.updateHeader();
+    }, 1000);
+  }
+
+  answer(answer) {
+    this.stopGame();
+    switch (answer.result) {
+      case Result.NEXT_LEVEL:
+        this.model.nextLevel();
+        this.startGame();
+        break;
+      case Result.DIE:
+        this.model.die();
+        this.endGame(false, !(this.model.isDead()));
+        break;
+      case Result.WIN:
+        this.endGame(true, false);
+        break;
+      default:
+        throw new Error(`Unknown result: ${answer.result}`);
+    }
+  }
+
+  restart(continueGame) {
+    if (!continueGame) {
+      this.model.restart();
+    }
+    this.startGame();
+  }
+
+  exit() {
+    Application.showStats(this.model);
+  }
+
+  updateHeader() {
+    const header = new HeaderView(this.model.state);
+    this.root.replaceChild(header.element, this.header.element);
+    this.header = header;
+  }
+
+  changeLevel() {
+    this.updateHeader();
+
+    const level = new LevelView(this.model.getCurrentLevel());
+    level.onAnswer = this.answer.bind(this);
+    this.changeContentView(level);
+    level.focus();
+  }
+
+
+  endGame(win, canContinue) {
+    const gameOver = new GameOverView(win, canContinue);
+    gameOver.onRestart = this.restart.bind(this);
+    gameOver.onExit = this.exit.bind(this);
+
+    this.changeContentView(gameOver);
+    this.updateHeader();
+  }
+
+  changeContentView(view) {
+    this.root.replaceChild(view.element, this.content.element);
+    this.content = view;
+  }
+}
+
+
+export default GameScreen;

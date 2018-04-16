@@ -1,12 +1,4 @@
-import gameScreen from './game/game-screen';
-import {changeView} from './util';
-import PreviewView from "./preview-view";
+import Application from "./application";
 
-const preview = new PreviewView();
-
-changeView(preview.element);
-
-preview.onAgreeClick = () => {
-  changeView(gameScreen);
-};
+Application.showWelcome();
 
