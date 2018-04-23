@@ -4,12 +4,9 @@ import {
   die, tick
 } from './quest';
 
-import QUEST from './quest-data';
-
-const getLevel = (state) => QUEST[`level-${state.level}`];
-
 class QuestModel {
-  constructor(playerName) {
+  constructor(data, playerName) {
+    this.data = data;
     this.playerName = playerName;
     this.restart();
   }
@@ -19,7 +16,7 @@ class QuestModel {
   }
 
   hasNextLevel() {
-    return getLevel(this._state.level + 1) !== void 0;
+    return this.getLevel(this._state.level + 1) !== void 0;
   }
 
   nextLevel() {
@@ -38,8 +35,12 @@ class QuestModel {
     return this._state.lives <= 0;
   }
 
+  getLevel(levelNumber) {
+    return this.data[`level-${levelNumber}`];
+  }
+
   getCurrentLevel() {
-    return getLevel(this._state);
+    return this.getLevel(this.state.level);
   }
 
   tick() {

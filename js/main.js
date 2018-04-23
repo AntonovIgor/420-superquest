@@ -1,4 +1,3 @@
-import Application from "./application";
+import Application from './application';
 
-Application.showWelcome();
-
+Application.start();
