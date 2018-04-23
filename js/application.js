@@ -1,25 +1,16 @@
 import WelcomeScreen from './welcome/welcome-screen';
 import GameScreen from './game/game-screen';
 import QuestModel from './data/quest-model';
-import StatsScreen from './stats/stats-screen';
 import SplashScreen from './splash/splash-screen';
 import ErrorView from "./error/error-screen";
-import {adaptServerData} from "./data/data-adapter";
+import Loader from "./loader";
+import ScoreBoard from "./scoreboard/scoreboard";
 
 const main = document.getElementById(`main`);
 const changeView = (element) => {
   main.innerHTML = ``;
   main.appendChild(element);
 };
-
-const checkStatus = (response) => {
-  if (response.status >= 200 && response.status < 300) {
-    return response;
-  } else {
-    throw new Error(`${response.status}: ${response.statusText}`);
-  }
-};
-
 
 let questData;
 export default class Application {
@@ -28,10 +19,7 @@ export default class Application {
     const splash = new SplashScreen();
     changeView(splash.element);
     splash.start();
-    window.fetch(`https://es.dump.academy/text-quest/quest`).
-      then(checkStatus).
-      then((response) => response.json()).
-      then((data) => adaptServerData(data)).
+    Loader.loadData().
       then(Application.showWelcome).
       catch(Application.showError).
       then(() => splash.stop());
@@ -50,8 +38,13 @@ export default class Application {
   }
 
   static showStats(model) {
-    const statistics = new StatsScreen(model);
-    changeView(statistics.element);
+    const playerName = model.playerName;
+    const scoreBoard = new ScoreBoard(playerName);
+    changeView(scoreBoard.view.element);
+    Loader.saveResults(model.state, playerName).
+      then(() => Loader.loadResults(playerName)).
+      then((data) => scoreBoard.showScores(data)).
+      catch(Application.showError);
   }
 
   static showError(error) {
