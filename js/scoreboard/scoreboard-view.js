@@ -1,4 +1,5 @@
 import AbstractView from '../abstract-view';
+import Application from '../application';
 
 export default class ScoreBoardView extends AbstractView {
 
@@ -7,7 +8,7 @@ export default class ScoreBoardView extends AbstractView {
 <div class="end">
   <div class="scoreboard">Scoreboard is loading...</div>
   <br>
-  <div class="repeat"><span class="repeat-action">Сыграть заново</span>&nbsp;|&nbsp;<span class="repeat-action">Выйти</a>🐌</div>
+  <div class="repeat"><span class="repeat-action">Сыграть заново</span>&nbsp;|&nbsp;<a class="repeat-action" href="https://google.com">Выйти</a>🐌</div>
 </div>`;
   }
 
@@ -35,6 +36,6 @@ export default class ScoreBoardView extends AbstractView {
   }
 
   onRepeat() {
-
+    Application.start();
   }
 }
