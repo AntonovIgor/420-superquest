@@ -15,14 +15,17 @@ const changeView = (element) => {
 let questData;
 export default class Application {
 
-  static start() {
+  static async start() {
     const splash = new SplashScreen();
     changeView(splash.element);
     splash.start();
-    Loader.loadData().
-      then(Application.showWelcome).
-      catch(Application.showError).
-      then(() => splash.stop());
+    try {
+      Application.showWelcome(await Loader.loadData());
+    } catch (e) {
+      Application.showError(e);
+    } finally {
+      splash.stop();
+    }
   }
 
   static showWelcome(data) {
@@ -37,14 +40,16 @@ export default class Application {
     gameScreen.startGame();
   }
 
-  static showStats(model) {
+  static async showStats(model) {
     const playerName = model.playerName;
     const scoreBoard = new ScoreBoard(playerName);
     changeView(scoreBoard.view.element);
-    Loader.saveResults(model.state, playerName).
-      then(() => Loader.loadResults(playerName)).
-      then((data) => scoreBoard.showScores(data)).
-      catch(Application.showError);
+    try {
+      await Loader.saveResults(model.state, playerName);
+      scoreBoard.showScores(await Loader.loadResults(playerName));
+    } catch (e) {
+      Application.showError(e);
+    }
   }
 
   static showError(error) {
